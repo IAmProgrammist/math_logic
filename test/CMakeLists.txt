@@ -1,0 +1,15 @@
+project(tests)
+
+add_executable(lab1_check_input_type_test lab1/check_input_type.c)
+target_link_libraries(lab1_check_input_type_test alg)
+add_executable(lab1_init_formula lab1/init_formula.c)
+target_link_libraries(lab1_init_formula alg)
+add_executable(lab1_free_formula lab1/free_formula.c)
+target_link_libraries(lab1_free_formula alg)
+add_executable(lab1_add_element lab1/add_element.c)
+target_link_libraries(lab1_add_element alg)
+
+add_test(NAME lab1CheckInputTypeTest COMMAND lab1_check_input_type_test)
+add_test(NAME lab1InitFormula COMMAND lab1_init_formula)
+add_test(NAME lab1FreeFormula COMMAND lab1_free_formula)
+add_test(NAME lab1AddElement COMMAND lab1_add_element)
