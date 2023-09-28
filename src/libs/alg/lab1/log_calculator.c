@@ -44,23 +44,6 @@ void addElement(Formula *formula, char element[LATIN_ALPHABET_LENGTH])
     memcpy(formula->val[formula->amount - 1], element, sizeof(char) * LATIN_ALPHABET_LENGTH);
 }
 
-void processFormula(Formula *formula, char *line)
-{
-    int type = checkInputType(formula->type);
-    if (type == INPUT_TYPE_INVALID)
-        return;
-
-    if (type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM)
-    {
-        return _processFormulaDisjunctive(formula, line);
-    }
-
-    if (type == INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM)
-    {
-        return _processFormulaConjunctive(formula, line);
-    }
-}
-
 static void _processFormulaDisjunctive(Formula *formula, char *line)
 {
     // ... & ... & ... + ... & ... & ... & ... + ... & ... & ...
@@ -267,8 +250,24 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
     }
 }
 
-bool _findValConjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
-    bool result = 1;
+void processFormula(Formula *formula, char *line)
+{
+    int type = checkInputType(formula->type);
+    if (type == INPUT_TYPE_INVALID)
+        return;
+
+    if (type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM)
+    {
+        return _processFormulaDisjunctive(formula, line);
+    }
+
+    if (type == INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM)
+    {
+        return _processFormulaConjunctive(formula, line);
+    }
+}
+
+static bool _findValConjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
     for (int i = 0; i < f.amount; i++)
     {
         char *element = f.val[i];
@@ -279,11 +278,11 @@ bool _findValConjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
             if (element[j] == LITERAL_UNDEF)
                 continue;
 
-            int current = (element[j] == LITERAL_POSITIVE) && val[j];
+            int current = (element[j] == LITERAL_POSITIVE) ? val[j] : !val[j];
 
             if (current)
             {
-                elementResult = 1;
+                elementResult = true;
                 break;
             }
         }
@@ -292,10 +291,10 @@ bool _findValConjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
             return false;
     }
 
-    return result;
+    return true;
 }
 
-bool _findValDisjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
+static bool _findValDisjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
     for (int i = 0; i < f.amount; i++)
     {
         char *element = f.val[i];
@@ -306,7 +305,7 @@ bool _findValDisjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
             if (element[j] == LITERAL_UNDEF)
                 continue;
 
-            int current = (element[j] == LITERAL_POSITIVE) && val[j];
+            int current = (element[j] == LITERAL_POSITIVE) ? val[j] : !val[j];
             if (!current)
             {
                 elementResult = false;
@@ -338,36 +337,4 @@ bool findVal(Formula formula, bool args[LATIN_ALPHABET_LENGTH])
     }
 
     return false;
-
-    bool result = type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM ? 0 : 1;
-    for (int i = 0; i < f.amount; i++)
-    {
-        char *element = f.val[i];
-        bool elementResult = type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM ? 1 : 0;
-
-        for (int j = 0; j < LATIN_ALPHABET_LENGTH; j++)
-        {
-            if (element[j] == LITERAL_UNDEF)
-                continue;
-
-            int current = element[j] == LITERAL_POSITIVE ? val[j] : !val[j];
-            if (type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM && !current)
-            {
-                elementResult = 0;
-                break;
-            }
-            if (type == INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM && current)
-            {
-                elementResult = 1;
-                break;
-            }
-        }
-
-        if (elementResult && type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM)
-            return 1;
-        if (!elementResult && type == INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM)
-            return 0;
-    }
-
-    return result;
 }
