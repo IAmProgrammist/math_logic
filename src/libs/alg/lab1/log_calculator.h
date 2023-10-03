@@ -48,7 +48,8 @@ void addElement(Formula *formula, char element[LATIN_ALPHABET_LENGTH]);
 // Выполняет парсинг формулы и сохраняет её в formula из строки line.
 // Формула в конъюнктивной нормальной форме должна иметь вид "(... + ... + ...) & (... + ... + ... + ...) & (... + ... + ...)"
 // Формула в дизъюнктивной нормальной форме должна иметь вид "... & ... & ... + ... & ... & ... & ... + ... & ... & ..."
-void processFormula(Formula *formula, char* line);
+// Возвращает false, если парсинг был выполнен успешно, иначе - true.
+bool processFormula(Formula *formula, char* line);
 
 // Возвращает значение формулы f при значениях переменных из val.
 bool findVal(Formula f, bool val[LATIN_ALPHABET_LENGTH]);

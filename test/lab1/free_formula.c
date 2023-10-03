@@ -6,8 +6,8 @@ int main() {
     Formula formula = initFormula(INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM);
     freeFormula(&formula);
     assert(formula.val == NULL);
-    assert(formula.amount == -1);
-    assert(formula.capacity == -1);
+    assert(formula.amount == 0);
+    assert(formula.capacity == 0);
     assert(formula.type == INPUT_TYPE_INVALID);
 
     return 0;

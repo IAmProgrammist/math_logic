@@ -17,8 +17,8 @@ int main() {
 
     Formula formula3 = initFormula(31293);
     assert(formula3.val == NULL);
-    assert(formula3.amount == -1);
-    assert(formula3.capacity == -1);
+    assert(formula3.amount == 0);
+    assert(formula3.capacity == 0);
     assert(formula3.type == INPUT_TYPE_INVALID);
 
     return 0;

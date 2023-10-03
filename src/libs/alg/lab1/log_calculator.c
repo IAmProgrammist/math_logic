@@ -52,7 +52,7 @@ void addElement(Formula *formula, char element[LATIN_ALPHABET_LENGTH])
     memcpy(formula->val[formula->amount - 1], element, sizeof(char) * LATIN_ALPHABET_LENGTH);
 }
 
-static void _processFormulaDisjunctive(Formula *formula, char *line)
+static bool _processFormulaDisjunctive(Formula *formula, char *line)
 {
     // ... & ... & ... + ... & ... & ... & ... + ... & ... & ...
 
@@ -72,8 +72,8 @@ static void _processFormulaDisjunctive(Formula *formula, char *line)
             // Отрицание должно стоять до переменной, а не после.
             if (letterIndex != -1)
             {
-                fprintf(stderr, "Parsing error at index %d", index);
-                return;
+                fprintf(stderr, "Parsing error at index %d\n", index);
+                return 1;
             }
             
             // Если отрицаний не было, значит переменная стоит с знаком !.
@@ -86,8 +86,8 @@ static void _processFormulaDisjunctive(Formula *formula, char *line)
             // Исключение ситуации, подобной "&&".
             if (letterIndex == -1)
             {
-                fprintf(stderr, "No literal present at index %d", index);
-                return;
+                fprintf(stderr, "No literal present at index %d\n", index);
+                return 1;
             }
 
             // Если встречаем &, сохраняем предыдущую переменную в элемент
@@ -100,8 +100,8 @@ static void _processFormulaDisjunctive(Formula *formula, char *line)
             // Исключение ситуации, подобной "++".
             if (letterIndex == -1)
             {
-                fprintf(stderr, "No literal present at index %d", index);
-                return;
+                fprintf(stderr, "No literal present at index %d\n", index);
+                return 1;
             }
 
             // Если встречаем +, сохраняем предыдущую переменную в элемент
@@ -124,8 +124,8 @@ static void _processFormulaDisjunctive(Formula *formula, char *line)
             // Если дошли до конца строки, сохраняем переменную в элемент, элемент в формулу.
             if (letterIndex == -1)
             {
-                fprintf(stderr, "No literal present at index %d", index);
-                return;
+                fprintf(stderr, "No literal present at index %d\n", index);
+                return 1;
             }
 
             element[letterIndex] = presence == LITERAL_UNDEF ? LITERAL_POSITIVE : presence;
@@ -138,15 +138,17 @@ static void _processFormulaDisjunctive(Formula *formula, char *line)
         }
         else
         {
-            fprintf(stderr, "Unknown character '%c' at index %d", input, index);
-            return;
+            fprintf(stderr, "Unknown character '%c' at index %d\n", input, index);
+            return 1;
         }
 
         line++, index++;
     }
+
+    return 0;
 }
 
-static void _processFormulaConjunctive(Formula *formula, char *line)
+static bool _processFormulaConjunctive(Formula *formula, char *line)
 {
     // (... + ... + ...) & (... + ... + ... + ...) & (... + ... + ...)
 
@@ -168,8 +170,8 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
             // Открывающая скобка возможна, если степень вложенности равна 0, она не содержится внутри конъюнкта, конъюнкт пустой. 
             if (presence != LITERAL_UNDEF || letterIndex != -1 || bracesCount != 0 || !elementEmpty)
             {
-                fprintf(stderr, "Parsing error at index %d", index);
-                return;
+                fprintf(stderr, "Parsing error at index %d\n", index);
+                return 1;
             }
 
             bracesCount++;
@@ -179,8 +181,8 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
             // Открывающая скобка возможна, если степень вложенности равна 1, а также конъюнкт не пустой.
             if (letterIndex == -1 || bracesCount != 1)
             {
-                fprintf(stderr, "Parsing error at index %d", index);
-                return;
+                fprintf(stderr, "Parsing error at index %d\n", index);
+                return 1;
             }
 
             // Сохраняем переменную в элемент.
@@ -195,8 +197,8 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
             // Отрицание должно стоять до переменной, а не после.
             if (letterIndex != -1)
             {
-                fprintf(stderr, "Parsing error at index %d", index);
-                return;
+                fprintf(stderr, "Parsing error at index %d\n", index);
+                return 1;
             }
 
             // Если отрицаний не было, значит переменная стоит с знаком !.
@@ -215,8 +217,8 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
             }
             else
             {
-                fprintf(stderr, "Brackets error at index %d", index);
-                return;
+                fprintf(stderr, "Brackets error at index %d\n", index);
+                return 1;
             }
         }
         else if (input == DISJUNCTION)
@@ -224,8 +226,8 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
             // Встретили +. Сохраняем переменную в элемент.
             if (letterIndex == -1)
             {
-                fprintf(stderr, "No literal present at index %d", index);
-                return;
+                fprintf(stderr, "No literal present at index %d\n", index);
+                return 1;
             }
 
             element[letterIndex] = presence == LITERAL_UNDEF ? LITERAL_POSITIVE : presence;
@@ -248,8 +250,8 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
             }
             else
             {
-                fprintf(stderr, "Brackets error at index %d", index);
-                return;
+                fprintf(stderr, "Brackets error at index %d\n", index);
+                return 1;
             }
 
             // Заканчиваем цикл чтения.
@@ -257,20 +259,22 @@ static void _processFormulaConjunctive(Formula *formula, char *line)
         }
         else
         {
-            fprintf(stderr, "Unknown character '%c' at index %d", input, index);
-            return;
+            fprintf(stderr, "Unknown character '%c' at index %d\n", input, index);
+            return 1;
         }
 
         line++, index++;
     }
+
+    return 0;
 }
 
-void processFormula(Formula *formula, char *line)
+bool processFormula(Formula *formula, char *line)
 {
     // В зависимости от типа формулы выполняем парсинг при помощи соответствующей функции.
     int type = checkInputType(formula->type);
     if (type == INPUT_TYPE_INVALID)
-        return;
+        return 1;
 
     if (type == INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM)
     {

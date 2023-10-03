@@ -1,28 +1,51 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "../libs/alg/lab1/log_calculator.h"
 
 int main()
 {
-    /*int type = INPUT_TYPE_INVALID;
+    int type = INPUT_TYPE_INVALID;
     while (checkInputType(type) == INPUT_TYPE_INVALID) {
         printf("Select normal form type (0 - disjunctive, 1 - conjunctive): ");
         scanf("%d", &type);
     }
-    Formula f = initFormula(type);
+
     char buf[512];
     gets(buf);
-    gets(buf);*/
+    Formula f;
+    do {
+    printf("Enter formula: ");
+        f = initFormula(type);
 
-    Formula f = initFormula(INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM);
-    processFormula(&f, "!A + B + A & !C");
+        gets(buf);
+    } while(processFormula(&f, buf));
 
-    printf("A B C F\n");
-    for (int i = 0; i < 8; i++) {
-        bool v[LATIN_ALPHABET_LENGTH] = {!!(i & 4), !!(i & 2), !!(i & 1)};
-        printf("%d %d %d %d\n", !!v[0], !!v[1], !!v[2], findVal(f, v));
+    bool isPresent[LATIN_ALPHABET_LENGTH] = {};
+    for (int i = 0; buf[i] != '\0'; i++) {
+        if (islower(buf[i]))
+            isPresent[buf[i] - 'a'] = true;
+        if (isupper(buf[i]))
+            isPresent[buf[i] - 'A'] = true;
     }
+
+    printf("Enter variables:\n");
+    for (int i = 0; i < LATIN_ALPHABET_LENGTH; i++) {
+        if (!isPresent[i]) continue;
+
+        printf("%c ", i + 'A');
+    }
+    printf("\n");
+
+    bool v[LATIN_ALPHABET_LENGTH];
+    for (int i = 0; i < LATIN_ALPHABET_LENGTH; i++) {
+        if (!isPresent[i]) continue;
+        
+        scanf("%d", v + i);
+    }
+        
+    printf("Result: %d", findVal(f, v));
 
     return 0;
 }
