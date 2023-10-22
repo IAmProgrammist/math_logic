@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.16)
-project(math_logic C CXX)
+project(math_logic C)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 11)
 
-enable_testing()
+message("LIBRARY_ONLY=${LIBRARY_ONLY}")
 
 add_subdirectory(src)
-add_subdirectory(test)
+
+if (NOT LIBRARY_ONLY)
+    enable_testing()
+    add_subdirectory(test)
+endif()
 
 install(TARGETS alg DESTINATION .)

@@ -40,7 +40,7 @@ void freeFormula(Formula *formula)
     formula->type = INPUT_TYPE_INVALID;
 }
 
-void addElement(Formula *formula, char element[LATIN_ALPHABET_LENGTH])
+void addElement(Formula *formula, const char element[LATIN_ALPHABET_LENGTH])
 {
     // Если количество больше вместимости, увеличиваем размер массива элементов в 2 раза + 1
     if (formula->amount >= formula->capacity)
@@ -52,7 +52,7 @@ void addElement(Formula *formula, char element[LATIN_ALPHABET_LENGTH])
     memcpy(formula->val[formula->amount - 1], element, sizeof(char) * LATIN_ALPHABET_LENGTH);
 }
 
-static bool _processFormulaDisjunctive(Formula *formula, char *line)
+static bool _processFormulaDisjunctive(Formula *formula, const unsigned char *line)
 {
     // ... & ... & ... + ... & ... & ... & ... + ... & ... & ...
 
@@ -148,7 +148,7 @@ static bool _processFormulaDisjunctive(Formula *formula, char *line)
     return 0;
 }
 
-bool _processFormulaConjunctive(Formula *formula, char *line)
+bool _processFormulaConjunctive(Formula *formula, const unsigned char *line)
 {
     // (... + ... + ...) & (... + ... + ... + ...) & (... + ... + ...)
 
@@ -269,7 +269,7 @@ bool _processFormulaConjunctive(Formula *formula, char *line)
     return 0;
 }
 
-bool processFormula(Formula *formula, char *line)
+bool processFormula(Formula *formula, const unsigned char *line)
 {
     // В зависимости от типа формулы выполняем парсинг при помощи соответствующей функции.
     int type = checkInputType(formula->type);
@@ -287,7 +287,7 @@ bool processFormula(Formula *formula, char *line)
     }
 }
 
-static bool _findValConjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
+static bool _findValConjunctive(Formula f, const bool val[LATIN_ALPHABET_LENGTH]) {
     // (... + ... + ...) & (... + ... + ... + ...) & (... + ... + ...)
     // Вычисления выполняются по ленивой схеме.
     
@@ -323,7 +323,7 @@ static bool _findValConjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
     return true;
 }
 
-static bool _findValDisjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
+static bool _findValDisjunctive(Formula f, const bool val[LATIN_ALPHABET_LENGTH]) {
     // ... & ... & ... + ... & ... & ... & ... + ... & ... & ...
     // Вычисления выполняются по ленивой схеме.
     for (int i = 0; i < f.amount; i++)
@@ -357,7 +357,7 @@ static bool _findValDisjunctive(Formula f, bool val[LATIN_ALPHABET_LENGTH]) {
     return false;
 }
 
-bool findVal(Formula formula, bool args[LATIN_ALPHABET_LENGTH])
+bool findVal(Formula formula, const bool args[LATIN_ALPHABET_LENGTH])
 {
     // В зависимости от типа формулы выполняем вычисление значения формулы.
     int type = checkInputType(formula.type);

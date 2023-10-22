@@ -43,15 +43,15 @@ Formula initFormula(int type);
 void freeFormula(Formula *formula);
 
 // Добавляет element (конъюнкт или дизъюнкт в зависимости от типа формулы) в formula.
-void addElement(Formula *formula, char element[LATIN_ALPHABET_LENGTH]);
+void addElement(Formula *formula, const char element[LATIN_ALPHABET_LENGTH]);
 
 // Выполняет парсинг формулы и сохраняет её в formula из строки line.
 // Формула в конъюнктивной нормальной форме должна иметь вид "(... + ... + ...) & (... + ... + ... + ...) & (... + ... + ...)"
 // Формула в дизъюнктивной нормальной форме должна иметь вид "... & ... & ... + ... & ... & ... & ... + ... & ... & ..."
 // Возвращает false, если парсинг был выполнен успешно, иначе - true.
-bool processFormula(Formula *formula, char* line);
+bool processFormula(Formula *formula, const unsigned char* line);
 
 // Возвращает значение формулы f при значениях переменных из val.
-bool findVal(Formula f, bool val[LATIN_ALPHABET_LENGTH]);
+bool findVal(Formula f, const bool val[LATIN_ALPHABET_LENGTH]);
 
 #endif //MATH_LOGIC_LOG_CALCULATOR_H
