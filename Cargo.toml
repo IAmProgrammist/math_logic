@@ -1,0 +1,14 @@
+[package]
+name = "math_logic"
+version = "2.0.0"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+cmake = "0.1"
+
+[[bin]]
+name = "lab2"
+path = "./src/lab2/main.rs"

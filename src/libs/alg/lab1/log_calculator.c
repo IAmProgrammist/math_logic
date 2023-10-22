@@ -58,7 +58,7 @@ static bool _processFormulaDisjunctive(Formula *formula, char *line)
 
     int presence = LITERAL_UNDEF;
     int letterIndex = -1;
-    char element[LATIN_ALPHABET_LENGTH] = {};
+    char element[LATIN_ALPHABET_LENGTH] = {0};
     int index = 0;
     while (1)
     {
@@ -148,14 +148,14 @@ static bool _processFormulaDisjunctive(Formula *formula, char *line)
     return 0;
 }
 
-static bool _processFormulaConjunctive(Formula *formula, char *line)
+bool _processFormulaConjunctive(Formula *formula, char *line)
 {
     // (... + ... + ...) & (... + ... + ... + ...) & (... + ... + ...)
 
     int bracesCount = 0;
     int presence = LITERAL_UNDEF;
     int letterIndex = -1;
-    char element[LATIN_ALPHABET_LENGTH] = {};
+    char element[LATIN_ALPHABET_LENGTH] = {0};
     bool elementEmpty = true;
     int index = 0;
     while (1)
