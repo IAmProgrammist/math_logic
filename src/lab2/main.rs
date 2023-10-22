@@ -1,7 +1,12 @@
 extern crate algr;
 
-use algr::lab1::{self, log_calculator::FormulaWrapper, log_calculator::INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM, log_calculator::INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM};
+use algr::FormulaWrapper;
 
 fn main() {
-    let form = FormulaWrapper::new(INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM);
+    // Rust doesnt add NUL at the end of a string wtf??!?!
+    let form = FormulaWrapper::new(1).unwrap().read("(!A) & (B)\0").unwrap();
+    println!("{}", form);
+
+    let used = form.getPerfectConjunctiveForm(false);
+    println!("{}", used);
 }

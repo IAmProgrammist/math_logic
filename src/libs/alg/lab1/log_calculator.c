@@ -21,7 +21,7 @@ Formula initFormula(int type)
     // Если тип невалидный - возвращаем формулу с ошибочным типом
     if (checkInputType(type) == INPUT_TYPE_INVALID)
         return (Formula){NULL, 0, 0, INPUT_TYPE_INVALID};
-    return (Formula){malloc(0), 0, 0, type};
+    return (Formula){malloc(sizeof(char*)), 0, 1, type};
 }
 
 void freeFormula(Formula *formula)
@@ -44,8 +44,7 @@ void addElement(Formula *formula, const char element[LATIN_ALPHABET_LENGTH])
 {
     // Если количество больше вместимости, увеличиваем размер массива элементов в 2 раза + 1
     if (formula->amount >= formula->capacity)
-        formula->val = realloc(formula->val, formula->capacity = (formula->capacity * 2 + 1));
-
+        formula->val = realloc(formula->val, sizeof(char*) * (formula->capacity = (formula->capacity * 2 + 1)));
     // Инициализируем массив переменных элемента формулы
     formula->val[formula->amount++] = malloc(sizeof(char) * LATIN_ALPHABET_LENGTH);
     // Копируем переменные в элемент формулы

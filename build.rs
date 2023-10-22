@@ -12,6 +12,7 @@ fn main()
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=alg");    
     println!("cargo:rerun-if-changed=./src/libs/alg/alg.h");
+    println!("cargo:rerun-if-changed=./src/libs/alg/lab1/log_calculator.c");
 
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate

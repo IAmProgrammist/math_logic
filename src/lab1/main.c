@@ -22,7 +22,7 @@ int main()
         gets(buf);
     } while(processFormula(&f, buf));
 
-    bool isPresent[LATIN_ALPHABET_LENGTH] = {};
+    bool isPresent[LATIN_ALPHABET_LENGTH] = {0};
     for (int i = 0; buf[i] != '\0'; i++) {
         if (islower(buf[i]))
             isPresent[buf[i] - 'a'] = true;
@@ -42,7 +42,9 @@ int main()
     for (int i = 0; i < LATIN_ALPHABET_LENGTH; i++) {
         if (!isPresent[i]) continue;
         
-        scanf("%d", v + i);
+        int temp;
+        scanf("%d", &temp);
+        v[i] = temp == 1;
     }
         
     printf("Result: %d", findVal(f, v));

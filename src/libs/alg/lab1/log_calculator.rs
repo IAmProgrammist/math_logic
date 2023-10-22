@@ -1,20 +1,5 @@
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-
-pub struct FormulaWrapper {
-    formula: Formula,
-}
-
-pub struct FormulaElement {
-    data: [i8; LATIN_ALPHABET_LENGTH as usize],
-}
-
-pub struct FormulaInterpetation {
-    data: [bool; LATIN_ALPHABET_LENGTH as usize],
-}
+use super::super::{Formula, FormulaElement, FormulaWrapper, FormulaInterpetation, INPUT_TYPE_INVALID, initFormula, processFormula, addElement,  
+    findVal, freeFormula};
 
 impl FormulaWrapper {
     pub fn new(formulaType: u32) -> Option<FormulaWrapper> {
@@ -44,7 +29,7 @@ impl FormulaWrapper {
         }
     }
 
-    pub fn getValueAtInterpretation(self, interpretation: FormulaInterpetation) -> bool {
+    pub fn getValueAtInterpretation(&self, interpretation: FormulaInterpetation) -> bool {
         unsafe {
             findVal(self.formula, interpretation.data.as_ptr())
         }
