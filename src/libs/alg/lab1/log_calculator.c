@@ -21,7 +21,7 @@ Formula initFormula(int type)
     // Если тип невалидный - возвращаем формулу с ошибочным типом
     if (checkInputType(type) == INPUT_TYPE_INVALID)
         return (Formula){NULL, 0, 0, INPUT_TYPE_INVALID};
-    return (Formula){malloc(sizeof(char*)), 0, 1, type};
+    return (Formula){malloc(0), 0, 0, type};
 }
 
 void freeFormula(Formula *formula)
@@ -212,12 +212,11 @@ bool _processFormulaConjunctive(Formula *formula, const unsigned char *line)
         else if (input == '\0')
         {
             // Дошли до конца строки. Записываем элемент в формулу. Проверяем, что степень вложенности == 0.
-            if (!elementEmpty || letterIndex != -1 || presence != LITERAL_UNDEF || bracesCount != 0)
+            if (bracesCount != 0 || presence != LITERAL_UNDEF)
                 return 1 + index;
-            else {
-                addElement(formula, element);
-                memset(element, LITERAL_UNDEF, LATIN_ALPHABET_LENGTH);
-            }
+
+            addElement(formula, element);
+            memset(element, LITERAL_UNDEF, LATIN_ALPHABET_LENGTH);
 
             // Заканчиваем цикл чтения.
             break;
