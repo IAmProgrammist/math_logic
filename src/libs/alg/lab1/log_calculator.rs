@@ -13,7 +13,7 @@ impl FormulaWrapper {
         }
     }
 
-    pub fn read(mut self, formulaVal: &str) -> Option<Self> {
+    pub fn read(mut self, formulaVal: String) -> Option<Self> {
         unsafe {
             if !processFormula(&mut (self.formula), formulaVal.as_ptr()) {
                 Some(self)

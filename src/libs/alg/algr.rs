@@ -8,6 +8,7 @@ pub struct FormulaWrapper {
     pub formula: Formula,
 }
 
+#[derive(Copy, Clone)]
 pub struct FormulaElement {
     pub data: [i8; LATIN_ALPHABET_LENGTH as usize],
 }

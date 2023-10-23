@@ -1,8 +1,10 @@
+use std::{usize, iter};
+
 use crate::INPUT_TYPE_INVALID;
 
 use super::super::{FormulaElement, FormulaWrapper, FormulaInterpetation, LATIN_ALPHABET_LENGTH, LITERAL_UNDEF, LITERAL_POSITIVE, LITERAL_NEGATIVE, INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM, INPUT_TYPE_DISJUNCTIVE_NORMAL_FORM};
 
-use itertools::Itertools;
+use itertools::{Itertools, Combinations};
 
 impl FormulaWrapper {
     pub fn getUsedVariables(&self) -> [bool; LATIN_ALPHABET_LENGTH as usize] {
@@ -68,39 +70,72 @@ impl FormulaWrapper {
 
     fn getAllAdditionalElements( 
         present_elements: Vec<FormulaElement>,
-        current_element: FormulaElement
+        current_element: FormulaElement, 
+        current_index: usize,
+        used_variables: [bool; LATIN_ALPHABET_LENGTH as usize]
     ) -> Vec<FormulaElement> {
         let mut result_elements: Vec<FormulaElement> = Vec::new();
-        result_elements.push(current_element);
+        let mut current_element = current_element;
+        if current_index == LATIN_ALPHABET_LENGTH as usize {
+            for element in present_elements {
+                if current_element.equals(element) {
+                    return result_elements;
+                }
+            }
 
+            result_elements.push(current_element);
+        } else if !used_variables[current_index] {
+            current_element.data[current_index] = LITERAL_UNDEF as i8;
+            let mut ar1 = FormulaWrapper::getAllAdditionalElements(present_elements, current_element, current_index + 1, used_variables);
+            result_elements.append(&mut ar1);
+        } else if used_variables[current_index] {
+            current_element.data[current_index] = LITERAL_POSITIVE as i8;
+            let mut ar = FormulaWrapper::getAllAdditionalElements(present_elements.clone(), current_element, current_index + 1, used_variables);
+            result_elements.append(&mut ar);
 
+            current_element.data[current_index] = LITERAL_NEGATIVE as i8;
+            let mut ar = FormulaWrapper::getAllAdditionalElements(present_elements, current_element, current_index + 1, used_variables);
+            result_elements.append(&mut ar);
+        }
+        
         result_elements
     }
 
     pub fn getStatements(&self, include_unused_variables: bool) -> Vec<FormulaWrapper> {
-        let statements: Vec<FormulaWrapper> = Vec::new();
+        let mut statements: Vec<FormulaWrapper> = Vec::new();
         let used_variables = if include_unused_variables {[true; LATIN_ALPHABET_LENGTH as usize]} else {self.getUsedVariables()};
         let perfect_conjunctive_formula = self.getPerfectConjunctiveForm(include_unused_variables);
         let mut additional_elements: Vec<FormulaElement> = Vec::new();
 
-        {
-            let mut current_element = FormulaElement {data: [LITERAL_UNDEF as i8; LATIN_ALPHABET_LENGTH as usize ]};
-            for i in 0..LATIN_ALPHABET_LENGTH as usize {
-                if used_variables[i] {
-                    current_element.data[i] = LITERAL_NEGATIVE as i8;
-                }
-            }    
+        let mut current_element = FormulaElement {data: [LITERAL_UNDEF as i8; LATIN_ALPHABET_LENGTH as usize ]};
+        let mut present_elements: Vec<FormulaElement> = Vec::new();
 
-            let mut present_elements: Vec<FormulaElement> = Vec::new();
+        for element in unsafe {std::slice::from_raw_parts(perfect_conjunctive_formula.formula.val, perfect_conjunctive_formula.formula.amount as usize)} {
+            let mut formula_element = FormulaElement{data: [LITERAL_UNDEF as i8; LATIN_ALPHABET_LENGTH as usize]};
 
-            // TODO: FIX THIS SHIT TOMORROW
-            for element in unsafe {std::slice::from_raw_parts(*perfect_conjunctive_formula.formula.val, perfect_conjunctive_formula.formula.amount as usize)} {
-                present_elements.push(value)
+            let element_data = unsafe {std::slice::from_raw_parts(*element, LATIN_ALPHABET_LENGTH as usize)};
+            for i in 0..element_data.len()  {
+                formula_element.data[i] = element_data[i];
             }
 
-            additional_elements = 
-            FormulaWrapper::getAllAdditionalElements(, 
-            current_element);
+            present_elements.push(formula_element);
+        }
+
+        additional_elements = 
+        FormulaWrapper::getAllAdditionalElements(present_elements.clone(), 
+        current_element, 0, used_variables);     
+        
+        for combs in 0..(additional_elements.len() + 1) {
+            let it = additional_elements.clone().into_iter().combinations(combs);
+            for combinations in it{
+                let mut formula = FormulaWrapper::new(INPUT_TYPE_CONJUNCTIVE_NORMAL_FORM).unwrap();
+
+                for el in [present_elements.clone(), combinations].concat() {
+                    formula.addElement(el);
+                }
+
+                statements.push(formula);
+            }
         }
 
         statements
@@ -108,7 +143,7 @@ impl FormulaWrapper {
 }
 
 impl FormulaElement {
-    pub fn equals(self, b: FormulaElement) -> bool {
+    pub fn equals(&self, b: FormulaElement) -> bool {
         for i in 0..LATIN_ALPHABET_LENGTH as usize {
             if (self.data[i] != b.data[i]) {
                 return false;
